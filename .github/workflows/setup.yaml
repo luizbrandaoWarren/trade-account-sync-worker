@@ -1,0 +1,51 @@
+name: Setup
+
+on:
+  workflow_call:
+    outputs:
+      ecs-cluster:
+        description: "ECS Cluster Name"
+        value: ${{ jobs.setup.outputs.ecs-cluster }}
+      aws-access-key-id:
+        description: "AWS Access Key Id"
+        value: ${{ jobs.setup.outputs.aws-access-key-id }}
+      aws-secret-access-key:
+        description: "AWS Secret Access Key"
+        value: ${{ jobs.setup.outputs.aws-secret-access-key }}
+      pkg-version-suffix:
+        description: "The package version suffix"
+        value: ${{ jobs.setup.outputs.pkg-version-suffix }}
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      pkg-version-suffix: ${{ steps.pkg-version-suffix.outputs.pkg-version-suffix }}
+      ecs-cluster: ${{ steps.ecs.outputs.ecs-cluster }}
+      aws-access-key-id: ${{ steps.aws-key-id.outputs.aws-access-key-id }}
+      aws-secret-access-key: ${{ steps.aws-secret-key.outputs.aws-secret-access-key }}
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - id: permissions
+        name: Set script permissions
+        run: chmod +x .deploy/setEnvironments.sh
+
+      - id: variables
+        name: Set Environments Variables
+        run: .deploy/setEnvironments.sh ${GITHUB_REF#refs/heads/}
+
+      - id: pkg-version-suffix
+        run: echo "::set-output name=pkg-version-suffix::${{env.PKG_VERSION_SUFFIX}}"
+
+      - id: ecs
+        run: echo "::set-output name=ecs-cluster::${{env.ECS_CLUSTER}}"
+
+      - id: aws-key-id
+        run: echo "::set-output name=aws-access-key-id::${{env.AWS_ACCESS_KEY_ID}}"
+
+      - id: aws-secret-key
+        run: echo "::set-output name=aws-secret-access-key::${{env.AWS_SECRET_ACCESS_KEY}}"

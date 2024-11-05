@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35219.272
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Trade.AccountSync.Worker", "src\Trade.AccountSync.Worker\Trade.AccountSync.Worker.csproj", "{780E95D4-5839-4CA8-90BD-70A5FD5DEEB7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Trade.AccountSync.Infra", "src\Trade.AccountSync.Infra\Trade.AccountSync.Infra.csproj", "{96A1EF0B-B279-4B24-AB64-22D741F5D7D9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{780E95D4-5839-4CA8-90BD-70A5FD5DEEB7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{780E95D4-5839-4CA8-90BD-70A5FD5DEEB7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{780E95D4-5839-4CA8-90BD-70A5FD5DEEB7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{780E95D4-5839-4CA8-90BD-70A5FD5DEEB7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{96A1EF0B-B279-4B24-AB64-22D741F5D7D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{96A1EF0B-B279-4B24-AB64-22D741F5D7D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{96A1EF0B-B279-4B24-AB64-22D741F5D7D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{96A1EF0B-B279-4B24-AB64-22D741F5D7D9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {99E124FA-94E7-4AC4-93FE-70B33344B2FF}
+	EndGlobalSection
+EndGlobal

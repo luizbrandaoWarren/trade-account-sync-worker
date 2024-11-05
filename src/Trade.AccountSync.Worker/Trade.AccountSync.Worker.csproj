@@ -1,0 +1,55 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <DockerfileContext>..\..</DockerfileContext>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="appsettings.Production.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="appsettings.Staging.json;appsettings.Local.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <DependentUpon>appsettings.json</DependentUpon>
+    </Content>
+    <Content Include="appsettings.Production.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <DependentUpon>appsettings.json</DependentUpon>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="3.7.1" />
+    <PackageReference Include="Serilog.AspNetCore" Version="4.1.0" />
+    <PackageReference Include="Serilog.Sinks.Seq" Version="5.1.1" />
+    <PackageReference Include="Serilog.Sinks.Sqs" Version="2.1.0" />
+    <PackageReference Include="Serilog.Warren" Version="2.1.0" />
+    <PackageReference Include="StackExchange.Redis.Extensions.Core" Version="5.5.0" />
+    <PackageReference Include="StackExchange.Redis.Extensions.Newtonsoft" Version="5.5.0" />
+    <PackageReference Include="Warren.Core.Extensions.Hosting" Version="2.4.0" />
+    <PackageReference Include="Warren.Core.FeatureFlag.Client" Version="4.2.0" />
+    <PackageReference Include="Warren.Core.Http.Client" Version="1.7.0" />
+    <PackageReference Include="Warren.Core.Messaging.AccountIntegration.Contracts" Version="4.0.0" />
+    <PackageReference Include="Warren.Core.Messaging.Risk.Contracts" Version="2.0.0" />
+    <PackageReference Include="Warren.Core.Messaging.Transaction.Contracts" Version="5.2.1" />
+    <PackageReference Include="Warren.Core.Messaging.Hosting.Providers.Kafka" Version="5.2.0" />
+    <PackageReference Include="Warren.Core.Messaging.Idempotency.Providers.Redis" Version="5.2.0" />
+    <PackageReference Include="Warren.Core.Messaging.Retry.Providers.Polly" Version="5.2.0" />
+    <PackageReference Include="Warren.Core.Messaging.Serialization.Providers.Kafka.SystemTextJson" Version="5.2.0" />
+    <PackageReference Include="Warren.Core.Slack.Client" Version="3.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Trade.AccountSync.Infra\Trade.AccountSync.Infra.csproj" />
+  </ItemGroup>
+
+</Project>

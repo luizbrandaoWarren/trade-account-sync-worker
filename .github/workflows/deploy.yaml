@@ -1,0 +1,65 @@
+name: deploy
+
+on:
+  workflow_call:
+    inputs:
+      ecs-cluster-name:
+        required: true
+        type: string
+      ecs-service-name:
+        required: true
+        type: string
+      ecr-repository:
+        required: true
+        type: string
+    secrets:
+      warren-github-pat:
+        required: true
+      aws-access-key-id:
+        required: true
+      aws-secret-access-key:
+        required: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Checkout ECS Deploy Action
+        uses: actions/checkout@v3
+        with:
+          repository: warrenbrasil/actions
+          token: ${{ secrets.warren-github-pat }}
+          path: .github/actions
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.aws-access-key-id }}
+          aws-secret-access-key: ${{ secrets.aws-secret-access-key }}
+          aws-region: us-east-1
+
+      - name: Login to Amazon ECR
+        id: ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Get Docker Tag
+        shell: bash
+        run: echo "##[set-output name=tag;]${GITHUB_SHA:0:7}"
+        id: tag
+
+      - name: Update Task Definition and Deploy
+        uses: ./.github/actions/ecs-deploy
+        id: deploy
+        with:
+          cluster: ${{ inputs.ecs-cluster-name }}
+          service: ${{ inputs.ecs-service-name }}
+          image: ${{ steps.ecr.outputs.registry }}/${{ inputs.ecr-repository }}:${{ steps.tag.outputs.tag }}
+          aws-access-key-id: ${{ secrets.aws-access-key-id }}
+          aws-secret-access-key: ${{ secrets.aws-secret-access-key }}
+          aws-region: us-east-1
+          timeout: 300

@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Trade.AccountSync.Worker": {
+      "commandName": "Project"
+    },
+    "Container (Dockerfile)": {
+      "commandName": "Docker"
+    }
+  }
+}

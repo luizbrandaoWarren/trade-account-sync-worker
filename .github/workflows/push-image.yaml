@@ -1,0 +1,73 @@
+name: push-image
+
+on:
+  workflow_call:
+    inputs:
+      ecr-repository:
+        required: true
+        type: string
+      dockerfile-path:
+        required: true
+        type: string
+    secrets:
+      aws-access-key-id:
+        required: true
+      aws-secret-access-key:
+        required: true
+      nuget-api-key:
+        required: true
+      nuget-user:
+        required: true
+
+jobs:
+  push-image:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.aws-access-key-id }}
+          aws-secret-access-key: ${{ secrets.aws-secret-access-key }}
+          aws-region: us-east-1
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Get Docker Tag
+        shell: bash
+        run: echo "##[set-output name=tag;]${GITHUB_SHA:0:7}"
+        id: tag
+
+      - name: Build Image
+        env:
+          DOCKERFILE_PATH: ${{ inputs.dockerfile-path }}
+          NUGET_USER: ${{ secrets.nuget-user }}
+          NUGET_API_KEY: ${{ secrets.nuget-api-key }}
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: ${{ inputs.ecr-repository }}
+        run: |
+          docker build -f $DOCKERFILE_PATH \
+             --build-arg NUGET_USER=$NUGET_USER \
+             --build-arg NUGET_API_KEY=$NUGET_API_KEY \
+             --force-rm -t $ECR_REGISTRY/$ECR_REPOSITORY:${{ steps.tag.outputs.tag }} .
+             
+      - name: Push image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: ${{ inputs.ecr-repository }}
+        run: docker push $ECR_REGISTRY/$ECR_REPOSITORY:${{ steps.tag.outputs.tag }}
+
+      - name: Push Latest
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: ${{ inputs.ecr-repository }}
+        run: |
+          [ $GITHUB_REF == 'refs/heads/main' ] \
+          && docker push $ECR_REGISTRY/$ECR_REPOSITORY \
+          || echo "Nothin to do, not main"

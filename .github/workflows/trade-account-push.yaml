@@ -1,0 +1,68 @@
+name: trade-account-push
+
+on:
+  push:
+    branches:
+      - staging
+      - main
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Configure .NET
+        uses: warrenbrasil/dotnet-config@v3
+        with:
+          dotnet-version: 8.0.x
+          nuget-user: ${{ secrets.NUGET_USER }}
+          nuget-api-key: ${{ secrets.NUGETAPIKEY }}
+          nuget-source: ${{ secrets.NUGET_SOURCE }}
+          nuget-source-name: ${{ secrets.NUGET_SOURCE_NAME }}
+
+      # - name: Run SonarQube Scan
+      #   uses: warrenbrasil/sonar-qube@v7
+      #   with:
+      #     sonar-token: ${{ secrets.SONAR_TOKEN }}
+      #     sonar-host-url: ${{ secrets.SONAR_HOST_URL }}
+      #     sonar-project-key: warrenbrasil_trade-account_AY8686Q8-uM92Acwf3vc
+      #     sonar-organization: warrenbrasil
+      #     solution: Trade.Account
+      #     code-exclusions: "**/Trade.Account.Infra.MySql/**/*.cs"
+      #     branch-name: ${{ github.head_ref || github.ref_name }}
+      #     pull-request: false
+
+  setup:
+    needs: tests
+    uses: ./.github/workflows/setup.yaml
+
+  push-api-image:
+    needs: setup
+    uses: ./.github/workflows/push-image.yaml
+    with:
+      ecr-repository: trade-account
+      dockerfile-path: src/Warren.Trade.Account.Api/Dockerfile
+    secrets:
+      aws-access-key-id: ${{ secrets[needs.setup.outputs.aws-access-key-id] }}
+      aws-secret-access-key: ${{ secrets[needs.setup.outputs.aws-secret-access-key] }}
+      nuget-api-key: ${{ secrets.NUGETAPIKEY }}
+      nuget-user: ${{ secrets.NUGET_USER }}
+
+  deploy-api:
+    needs:
+      - setup
+      - push-api-image
+    uses: ./.github/workflows/deploy.yaml
+    with:
+      ecs-cluster-name: ${{ needs.setup.outputs.ecs-cluster }}
+      ecs-service-name: trade-account
+      ecr-repository: trade-account
+    secrets:
+      aws-access-key-id: ${{ secrets[needs.setup.outputs.aws-access-key-id] }}
+      aws-secret-access-key: ${{ secrets[needs.setup.outputs.aws-secret-access-key] }}
+      warren-github-pat: ${{ secrets.WARRENBRASIL_GITHUB_PAT }}

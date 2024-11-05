@@ -1,0 +1,36 @@
+name: trade-taccount-pull-request
+
+on: pull_request
+
+jobs:
+  tests:
+    name: Run Trade Account Services Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure .NET
+        uses: warrenbrasil/dotnet-config@v4
+        with:
+          dotnet-version: 8.0.x
+          nuget-user: ${{ secrets.NUGET_USER }}
+          nuget-api-key: ${{ secrets.NUGETAPIKEY }}
+          nuget-source: ${{ secrets.NUGET_SOURCE }}
+          nuget-source-name: ${{ secrets.NUGET_SOURCE_NAME }}
+
+      # - name: Run SonarQube Scan
+      #   uses: warrenbrasil/sonar-qube@v7
+      #   with:
+      #     sonar-token: ${{ secrets.SONAR_TOKEN }}
+      #     sonar-host-url: ${{ secrets.SONAR_HOST_URL }}
+      #     sonar-project-key: warrenbrasil_trade-taccount_AY8686Q8-uM92Acwf3vc
+      #     sonar-organization: warrenbrasil
+      #     solution: Trade.Account.Services
+      #     code-exclusions: "**/Trade.Account.Services.Infra.MySql/**/*.cs"
+      #     pull-request: true
+      #     pull-request-number: ${{ github.event.pull_request.number }}
+      #     pull-request-base: ${{ github.event.pull_request.base.ref }}
+      #     pull-request-head: ${{ github.event.pull_request.head.ref }}
